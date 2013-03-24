@@ -24,6 +24,9 @@ out status
 
             Console.WriteLine(regKeyValueReturned + "\n" + status);
 
+            rOPs.keyWrite(@"HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Run", "asdasdd", "REG_SZ", "sdasdasd", out status);
+            Console.WriteLine(status);
+
 //             //Console.WriteLine(Registry.GetValue(
 //             //   @"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\New Key #1",
 //             //   "",

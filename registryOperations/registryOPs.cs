@@ -12,16 +12,24 @@ namespace registryOperations
         {
         }
 
+        #region eXceptionEnum
         private enum eXceptionEnum
         { 
-            QUERY_SUCCESSFUL = 0,
+            QUERY_OR_WRITE_SUCCESSFUL = 0,
             PERMISSION_DENIED = 2,
             NULL_REFERENCE_EXCEPTION = 3,
             IOEXCEPTION  = 4,
             ARGUMENT_EXCEPTION = 5,
             KEY_DOES_NOT_EXIST = 6,
-            KEY_VALUE_NAME_DOES_NOT_EXIST = 7 
+            KEY_VALUE_NAME_DOES_NOT_EXIST = 7,
+            ARGUMENT_NULL_EXCEPTION = 8,
+            UNAUTHORIZED_ACCESS_EXCEPTION = 9,
+            SECURITY_EXCEPTION = 10 
         };
+
+        #endregion
+
+        #region keyRead
 
         public string keyRead(
             string keyName,
@@ -90,7 +98,7 @@ namespace registryOperations
                     );
 
 
-                    readStatus = (uint)eXceptionEnum.QUERY_SUCCESSFUL;
+                    readStatus = (uint)eXceptionEnum.QUERY_OR_WRITE_SUCCESSFUL;
  
                 }
 
@@ -158,11 +166,105 @@ namespace registryOperations
                 keyValueData = "ArgumentException";
                 readStatus = (uint)eXceptionEnum.ARGUMENT_EXCEPTION;
             }
-                
-                
-                
-                
+               
                 return keyValueData;
         }
+
+        #endregion
+
+        #region keyWrite
+
+        public void keyWrite(
+          string keyName,
+          string keyValueName,
+          string keyValueType,
+          string keyValueData,
+          out uint writeStatus)
+        {
+            writeStatus = uint.MinValue;//ZERO
+            string writeThis = string.Empty;
+            RegistryValueKind keyValueKind;
+
+            switch (keyValueData)
+            {
+
+                case "REG_BINARY":
+                    keyValueKind = RegistryValueKind.Binary;
+                    break;
+
+                case "REG_DWORD":
+                    keyValueKind = RegistryValueKind.DWord;
+                    break;
+
+                case "REG_EXPAND_SZ":
+                    keyValueKind = RegistryValueKind.ExpandString;
+                    break;
+
+                case "REG_MULTI_SZ":
+                    keyValueKind = RegistryValueKind.MultiString;
+                    break;
+
+                case "REG_QWORD":
+                    keyValueKind = RegistryValueKind.QWord;
+                    break;
+
+                case "REG_SZ":
+                    keyValueKind = RegistryValueKind.String;
+                    break;
+
+                case "REG_DWORD_LITTLE_ENDIAN":
+                    keyValueKind = RegistryValueKind.DWord;
+                    break;
+
+                case "REG_QWORD_LITTLE_ENDIAN":
+                    keyValueKind = RegistryValueKind.QWord;
+                    break;
+
+                case "REG_DWORD_BIG_ENDIAN":
+                    keyValueKind = RegistryValueKind.Unknown;
+                    break;
+
+                case "REG_LINK":
+                    keyValueKind = RegistryValueKind.Unknown;
+                    break;
+
+                case "REG_RESOURCE_LIST":
+                    keyValueKind = RegistryValueKind.Unknown;
+                    break;
+
+                case "REG_NONE":
+                    keyValueKind = RegistryValueKind.Unknown;
+                    break;
+
+                default:
+                    keyValueKind = RegistryValueKind.String;
+                    break;
+            }
+
+            try
+            {
+                Registry.SetValue(
+                    keyName,
+                    keyValueName,
+                    keyValueData,
+                    keyValueKind
+                    );
+
+                writeStatus = (uint)eXceptionEnum.QUERY_OR_WRITE_SUCCESSFUL;
+
+            }
+
+
+            catch (System.ArgumentNullException) { writeStatus = (uint)eXceptionEnum.ARGUMENT_NULL_EXCEPTION; }
+            catch (System.ArgumentException) { writeStatus = (uint)eXceptionEnum.ARGUMENT_EXCEPTION; }
+            catch (System.UnauthorizedAccessException) { writeStatus = (uint)eXceptionEnum.UNAUTHORIZED_ACCESS_EXCEPTION; }
+            catch (System.Security.SecurityException) { writeStatus = (uint)eXceptionEnum.SECURITY_EXCEPTION; }
+            catch (System.NullReferenceException) {writeStatus = (uint)eXceptionEnum.NULL_REFERENCE_EXCEPTION;}
+
+        }
+        #endregion
+
+
+
     }
 }
