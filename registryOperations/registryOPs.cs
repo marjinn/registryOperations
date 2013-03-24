@@ -12,11 +12,17 @@ namespace registryOperations
         {
         }
 
+        ~registryOPs()
+        { 
+        }
+
         #region eXceptionEnum
+
         private enum eXceptionEnum
         { 
             QUERY_OR_WRITE_SUCCESSFUL = 0,
-            PERMISSION_DENIED = 2,
+            QUERIED_DEFAULT_VALUE = 1 ,
+            PERMISSION_DENIED = 2,//same as SECURITY_EXCEPTION
             NULL_REFERENCE_EXCEPTION = 3,
             IOEXCEPTION  = 4,
             ARGUMENT_EXCEPTION = 5,
@@ -24,8 +30,34 @@ namespace registryOperations
             KEY_VALUE_NAME_DOES_NOT_EXIST = 7,
             ARGUMENT_NULL_EXCEPTION = 8,
             UNAUTHORIZED_ACCESS_EXCEPTION = 9,
-            SECURITY_EXCEPTION = 10 
+            SECURITY_EXCEPTION = 10 //same as PERMISSION_DENIED
+            
         };
+
+
+       
+
+           
+
+            //private void eXceptionD()
+            //{
+            //    Dictionary<int, string> eXceptionDictionary =
+            //   new Dictionary<int, string>();
+
+            //    eXceptionDictionary.Add(0, "QUERY_OR_WRITE_SUCCESSFUL");
+            //    eXceptionDictionary.Add(2, "PERMISSION_DENIED");
+            //    eXceptionDictionary.Add(3, "NULL_REFERENCE_EXCEPTION");
+            //    eXceptionDictionary.Add(4, "IOEXCEPTION");
+            //    eXceptionDictionary.Add(5, "ARGUMENT_EXCEPTION");
+            //    eXceptionDictionary.Add(6, "KEY_DOES_NOT_EXIST");
+            //    eXceptionDictionary.Add(7, "KEY_VALUE_NAME_DOES_NOT_EXIST");
+            //    eXceptionDictionary.Add(8, "ARGUMENT_NULL_EXCEPTION");
+            //    eXceptionDictionary.Add(9, "UNAUTHORIZED_ACCESS_EXCEPTION");
+            //    eXceptionDictionary.Add(10, "SECURITY_EXCEPTION");
+            //}
+      
+       
+
 
         #endregion
 
@@ -66,19 +98,40 @@ namespace registryOperations
 
                 if (keyValueData.Equals("<Not Found>"))
                 {
-                    System.Diagnostics.Debug.WriteLine("\n"
-                     + "Requested registry keyValueName does not exist."
-                     + "\n"
-                     + "RegistryKey : " + keyName
-                     + "\n"
-                     + "keyValueName : " + keyValueName
-                     + "\n"
-                     + "keyValueData : " + keyValueData
-                    + "\n"
+                    if (keyValueName != null)
+                    {
+                        System.Diagnostics.Debug.WriteLine("\n"
+                         + "Requested registry keyValueName does not exist."
+                         + "\n"
+                         + "RegistryKey : " + keyName
+                         + "\n"
+                         + "keyValueName : " + keyValueName
+                         + "\n"
+                         + "keyValueData : " + keyValueData
+                        + "\n"
 
-                     );
+                         );
 
-                    readStatus = (uint)eXceptionEnum.KEY_VALUE_NAME_DOES_NOT_EXIST;
+
+                        readStatus = (uint)eXceptionEnum.KEY_VALUE_NAME_DOES_NOT_EXIST;
+                    }
+
+                    else
+                    {
+                        System.Diagnostics.Debug.WriteLine("\n"
+                         + "Requested registry keyValueName does not exist."
+                         + "\n"
+                         + "RegistryKey : " + keyName
+                         + "\n"
+                         + "keyValueName : " + keyValueName
+                         + "\n"
+                         + "keyValueData : " + keyValueData
+                        + "\n"
+                        );
+
+                        keyValueData = string.Empty;
+                        readStatus = (uint)eXceptionEnum.QUERIED_DEFAULT_VALUE;
+                    }
                 }//could also mean the keyValueName is (Default) and keyValueData is (value not set)
                     //basically could be a blank entry
                 //meaning if i query (Default) valuename it will return <Not Found>
@@ -185,7 +238,7 @@ namespace registryOperations
             string writeThis = string.Empty;
             RegistryValueKind keyValueKind;
 
-            switch (keyValueData)
+            switch (keyValueType)
             {
 
                 case "REG_BINARY":
@@ -255,11 +308,107 @@ namespace registryOperations
             }
 
 
-            catch (System.ArgumentNullException) { writeStatus = (uint)eXceptionEnum.ARGUMENT_NULL_EXCEPTION; }
-            catch (System.ArgumentException) { writeStatus = (uint)eXceptionEnum.ARGUMENT_EXCEPTION; }
-            catch (System.UnauthorizedAccessException) { writeStatus = (uint)eXceptionEnum.UNAUTHORIZED_ACCESS_EXCEPTION; }
-            catch (System.Security.SecurityException) { writeStatus = (uint)eXceptionEnum.SECURITY_EXCEPTION; }
-            catch (System.NullReferenceException) {writeStatus = (uint)eXceptionEnum.NULL_REFERENCE_EXCEPTION;}
+            catch (System.ArgumentNullException) 
+            {
+                System.Diagnostics.Debug.WriteLine("\n"
+                    + " Registry Write Operation Failed "
+                    + "\n"
+                    + "'keyValueName' is a null reference "
+                    + "\n"
+                    + "RegistryKey : " + keyName
+                    + "\n"
+                    + "keyValueName : " + keyValueName
+                    + "\n"
+                    + "keyValueKind : " + keyValueType
+                    + "\n"
+                    + "keyValueData : " + keyValueData
+                    + "\n"
+
+                    );
+                writeStatus = (uint)eXceptionEnum.ARGUMENT_NULL_EXCEPTION; 
+            }
+
+            catch (System.ArgumentException)
+            {
+                System.Diagnostics.Debug.WriteLine("\n"
+                    + " Registry Write Operation Failed for one of the following reasons : "
+                    + "\n"
+                    + "'keyValueName' does not begin with a valid registry root "
+                    + "\n"
+                    + "'keyValueName' is longer than the maximum length allowed (255 characters). "
+                    +"\n"
+                    + "The type of value did not match the registry data type specified by valueKind, therefore the data could not be converted properly."
+                    +"\n"
+                    + "RegistryKey : " + keyName
+                    + "\n"
+                    + "keyValueName : " + keyValueName
+                    + "\n"
+                    + "keyValueKind : " + keyValueType
+                    + "\n"
+                    + "keyValueData : " + keyValueData
+                    + "\n"
+
+                    );
+                writeStatus = (uint)eXceptionEnum.ARGUMENT_EXCEPTION; 
+            }
+
+            catch (System.UnauthorizedAccessException)
+            {
+                System.Diagnostics.Debug.WriteLine("\n"
+                    + " Registry Write Operation Failed "
+                    + "\n"
+                    + "The RegistryKey is read-only, and thus cannot be written to; for example, it is a root-level node, or the key has not been opened with write access."
+                    + "\n"
+                    + "RegistryKey : " + keyName
+                    + "\n"
+                    + "keyValueName : " + keyValueName
+                    + "\n"
+                    + "keyValueKind : " + keyValueType
+                    + "\n"
+                    + "keyValueData : " + keyValueData
+                    + "\n"
+
+                    );
+                writeStatus = (uint)eXceptionEnum.UNAUTHORIZED_ACCESS_EXCEPTION; 
+            }
+
+            catch (System.Security.SecurityException)
+            {
+                System.Diagnostics.Debug.WriteLine("\n"
+                    + " Registry Write Operation Failed "
+                    + "\n"
+                    + "The user does not have the permissions required to create or modify registry keys. "
+                    + "\n"
+                    + "RegistryKey : " + keyName
+                    + "\n"
+                    + "keyValueName : " + keyValueName
+                    + "\n"
+                    + "keyValueKind : " + keyValueType
+                    + "\n"
+                    + "keyValueData : " + keyValueData
+                    + "\n"
+
+                    );
+                writeStatus = (uint)eXceptionEnum.SECURITY_EXCEPTION;
+            }
+
+            catch (System.NullReferenceException) 
+            {
+                System.Diagnostics.Debug.WriteLine("\n"
+                    + " Registry Write Operation Failed "
+                    + "\n"
+                    + "RegistryKey : " + keyName
+                    + "\n"
+                    + "keyValueName : " + keyValueName
+                    + "\n"
+                    + "keyValueKind : " + keyValueType
+                    + "\n"
+                    + "keyValueData : " + keyValueData
+                    + "\n"
+
+                    );
+                writeStatus = (uint)eXceptionEnum.NULL_REFERENCE_EXCEPTION;
+            }
 
         }
         #endregion
