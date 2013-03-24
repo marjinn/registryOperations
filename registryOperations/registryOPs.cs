@@ -45,6 +45,7 @@ namespace registryOperations
             //   new Dictionary<int, string>();
 
             //    eXceptionDictionary.Add(0, "QUERY_OR_WRITE_SUCCESSFUL");
+            //    eXceptionDictionary.Add(1, "QUERIED_DEFAULT_VALUE");
             //    eXceptionDictionary.Add(2, "PERMISSION_DENIED");
             //    eXceptionDictionary.Add(3, "NULL_REFERENCE_EXCEPTION");
             //    eXceptionDictionary.Add(4, "IOEXCEPTION");
