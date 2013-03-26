@@ -4,16 +4,23 @@ using System.Text;
 
 using Microsoft.Win32;
 
-///SystemInfoCollector 'own Registry Read/Write Class
-namespace SystemInfoCollector
+namespace registryOperations
 {
+    /// <summary>
+    /// 
+    /// </summary>
     class registryOPs
     {
-
+        /// <summary>
+        /// 
+        /// </summary>
         public registryOPs()
         {
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         ~registryOPs()
         { 
         }
