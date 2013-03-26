@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 
 using Microsoft.Win32;
-namespace registryOperations
+
+///SystemInfoCollector 'own Registry Read/Write Class
+namespace SystemInfoCollector
 {
     class registryOPs
     {
@@ -16,6 +18,9 @@ namespace registryOperations
         { 
         }
 
+        /// <summary>
+        /// eXceptionEnum
+        /// </summary>
         #region eXceptionEnum
 
         private enum eXceptionEnum
@@ -62,6 +67,14 @@ namespace registryOperations
 
         #endregion
 
+
+        /// <summary>
+        /// keyRead - logs read success to readStatus [0 =  Success] 
+        /// </summary>
+        /// <param name="keyName"></param>
+        /// <param name="keyValueName"></param>
+        /// <param name="readStatus"></param>
+        /// <returns>keyValueData</returns>
         #region keyRead
 
         public string keyRead(
@@ -226,6 +239,15 @@ namespace registryOperations
 
         #endregion
 
+
+        /// <summary>
+        /// keyWrite - logs write success to writeStatus [0 =  Success] 
+        /// </summary>
+        /// <param name="keyName"></param>
+        /// <param name="keyValueName"></param>
+        /// <param name="keyValueType"></param>
+        /// <param name="keyValueData"></param>
+        /// <param name="writeStatus"></param>
         #region keyWrite
 
         public void keyWrite(
